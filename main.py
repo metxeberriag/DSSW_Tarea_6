@@ -1,9 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
- 
+
 import webapp2
 import re
+from google.appengine.ext.webapp \
+    import template
+from webapp2_extras import sessions
+import session_module
 from google.appengine.ext import ndb
+
+
+class MainHandler(session_module.BaseSessionHandler):
+    def get(self):
+        sessionMessage = ""
+        counterMessage = ""
+
+        attr = {
+            'sessionMessage': sessionMessage,
+            'counterMessage': counterMessage
+        }
+
+        self.response.out.write(template.render('html/main.html', attr))
+
+
+class LogoutHandler(session_module.BaseSessionHandler):
+    def get(self):
+        if(self.session['counter']):
+            del self.session['counter']
+        self.redirect('/')
 
 class User(ndb.Model):
     username = ndb.StringProperty(required=True)
@@ -14,116 +38,62 @@ class User(ndb.Model):
 class RegisterHandler(webapp2.RequestHandler):
     
     def get(self):
-        self.response.write('''
-        <html>
-            <head>
-                <link rel="stylesheet" href="styles/estilo.css">
-                <script src="scripts/validator.js"></script>
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-            </head>
-            <body>
-                <h1 class="register-title">DSSW - TAREA 4</h1>
-                <form method="post" id="login" class="register">
-                    <table>
-                        <tr>
-                            <td class="label"> Nombre de usuario </td>
-                            <td> <input type="text" name="username" id="username" value="" placeholder="Tu nombre..." class="register-input"> </td>
-                            <td> <span id="errorUsername" style="color:red"></span> </td>
-                        </tr>
-                        <tr>
-                            <td class="label"> Password </td>
-                            <td> <input type="password" name="password1" id="password1" value="" placeholder="Tu contraseña..." class="register-input"></td>
-                            <td> <span id="errorPassword1" style="color:red"></span> </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Repetir Password </td>
-                            <td> <input type="password" name="password2" id="password2" value="" placeholder="El mismo de antes" class="register-input"> </td>
-                            <td> <span id="errorPassword" style="color:red"></span> </td>
-                        </tr>
-                        <tr>
-                            <td class="label"> Email </td>
-                            <td> <input type="text" onBlur="validarEmailAjax()" name="email" value="" id="email" placeholder="Tu email..." class="register-input"> </td>
-                            <td> <span id="errorEmail"></span></td>
-                        </tr>
-                    </table>
-                    <input type="submit" id="enviar" class="register-button">
-                </form>
-            </body>
-            </html>''')
+        self.response.write(template.render('html/registro.html', {}))
     
     def post(self):
         errorUsername = ""
         errorEmail = ""
-        errorPassword = ""
         errorPassword1 = ""
+        errorPassword2 = ""
+        username = self.request.get('username')
+        password1 = self.request.get('password1')
+        password2 = self.request.get('password2')
+        email = self.request.get('email')
         valido = True
         USER_RE = re.compile(r"^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$")
         PASSWORD_RE = re.compile(r"^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$")
         EMAIL_RE = re.compile(r"^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$")
-        if not USER_RE.match(self.request.get('username')):
+        
+        if not USER_RE.match(username):
             errorUsername = "El username no es correcto!"
             valido = False
         
-        if not PASSWORD_RE.match(self.request.get('password1')):
+        if not PASSWORD_RE.match(password1):
             errorPassword1 = "El password no es correcto!"
             valido = False
         
-        if not PASSWORD_RE.match(self.request.get('password2')):
-            errorPassword = "El password no es correcto!"
+        if not PASSWORD_RE.match(password2):
+            errorPassword2 = "El password no es correcto!"
             valido = False
         
-        if not self.request.get('password1')==self.request.get('password2'):
-            errorPassword = "Los password no coinciden!"
+        if not password1==password2:
+            errorPassword2 = "Los password no coinciden!"
             valido = False
 
-        if not EMAIL_RE.match(self.request.get('email')):
+        if not EMAIL_RE.match(email):
             errorEmail = "El email no es correcto!"
             valido = False
         
         if not valido:
-            self.response.write('''
-        <html>
-            <head>
-                <link rel="stylesheet" href="styles/estilo.css">
-                <script src="scripts/validator.js"></script>
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-            </head>
-            <body>
-                <h1 class="register-title">DSSW - TAREA 4</h1>
-                <form method="post" id="login" class="register">
-                    <table>
-                        <tr>
-                            <td class="label"> Nombre de usuario </td>
-                            <td> <input type="text" name="username" id="username" value="" placeholder="Tu nombre..." class="register-input"> </td>
-                            <td> <span id="errorUsername" style="color:red">'''+errorUsername+'''</span> </td>
-                        </tr>
-                        <tr>
-                            <td class="label"> Password </td>
-                            <td> <input type="password" name="password1" id="password1" value="" placeholder="Tu contraseña..." class="register-input"></td>
-                            <td> <span id="errorPassword1" style="color:red">'''+errorPassword1+''' </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Repetir Password </td>
-                            <td> <input type="password" name="password2" id="password2" value="" placeholder="El mismo de antes" class="register-input"> </td>
-                            <td> <span id="errorPassword" style="color:red">'''+errorPassword+'''</span> </td>
-                        </tr>
-                        <tr>
-                            <td class="label"> Email </td>
-                            <td> <input type="text" name="email" value="" id="email" placeholder="Tu email..." class="register-input" onBlur="validarEmailAjax()"> </td>
-                            <td> <span id="errorEmail" style="color:red">'''+errorEmail+'''</span> </td>
-                        </tr>
-                    </table>
-                    <input type="submit" id="enviar" class="register-button">
-                </form>
-            </body>
-            </html>''')
+            attr = {
+                'username' : username,
+                'password1' : password1,
+                'password2' : password2,
+                'email' : email,
+                'errorUsername': errorUsername,
+                'errorEmail' : errorEmail,
+                'errorPassword1' : errorPassword1,
+                'errorPassword2' : errorPassword2
+            }
+
+            self.response.write(template.render('html/registroNoValido.html', attr))
 
         if valido:
             correctoEmail = False
             correctoUser = False
             errorDatos = ""
-            nusers = User.query(User.username==self.request.get('username')).count()
-            nemails = User.query(User.email==self.request.get('email')).count()
+            nusers = User.query(User.username==username).count()
+            nemails = User.query(User.email==email).count()
             if nemails==1:
                 # está en el modelo
                 correctoEmail = False
@@ -149,123 +119,73 @@ class RegisterHandler(webapp2.RequestHandler):
                 datos.email = self.request.get('email')
                 datos.password = self.request.get('password1')
                 datos.put()
-                self.response.write('''
-                <html>
-                    <head>
-                        <link rel="stylesheet" href="styles/estilo.css">
-                    </head>
-                    <body>
-                        <h1 class="register-title">DSSW - TAREA 4</h1>
-                        <form class="register">
-                        <h2>El registro se ha completado correctamente!</h2><br>'''
-                                + "<p>Hola " + self.request.get('username')+'''!</p><br>'''
-                                + "<p>Tu email es " + self.request.get('email')+'''</p><br><br>
-                            <a href="/registro" class="register-button">Volver</a>
-                        </form>
-                    </body>
-                </html>''')
+                attr = { 
+                    'username' : username,
+                    'email' : email
+                }
+                self.response.write(template.render('html/registroCorrecto.html', attr))
+
             else:
-                self.response.write('''
-                    <html>
-                    <head>
-                    <link rel="stylesheet" href="styles/estilo.css">
-                    <script src="scripts/validator.js"></script>
-                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-                    </head>
-                    <body>
-                    <h1 class="register-title">DSSW - TAREA 4</h1>
-                    <form method="post" id="login" class="register">
-                    <table>
-                    <tr>
-                    <td class="label"> Nombre de usuario </td>
-                    <td> <input type="text" name="username" id="username" value="" placeholder="Tu nombre..." class="register-input"> </td>
-                    <td> <span id="errorUsername" style="color:red"></span> </td>
-                    </tr>
-                    <tr>
-                    <td class="label"> Password </td>
-                    <td> <input type="password" name="password" id="password1" value="" placeholder="Tu contraseña..." class="register-input"></td>
-                    <td> <span id="errorPassword1" style="color:red"></span> </td>
-                    </tr>
-                    <tr>
-                    <td class="label">Repetir Password </td>
-                    <td> <input type="password" name="password2" id="password2" value="" placeholder="El mismo de antes" class="register-input"> </td>
-                    <td> <span id="errorPassword" style="color:red"></span> </td>
-                    </tr>
-                    <tr>
-                    <td class="label"> Email </td>
-                    <td> <input type="text" name="email" value="" id="email" placeholder="Tu email..." class="register-input" onBlur="validarEmailAjax()"> </td>
-                    <td> <span id="errorEmail" style="color:red"></span> </td>
-                    </tr>
-                    </table>
-                    <input type="submit" id="enviar" class="register-button">
-                    <span id="errorDatos" style="color:red"> Ese '''+errorDatos+''' ya existe!</span>
-                    </form>
-                    </body>
-                    </html>''')
+                attr = { 'errorDatos' : errorDatos }
+                self.response.write(template.render('html/registroError.html', attr))
                       
 class ValidatorHandler(webapp2.RequestHandler):
     def get (self) :
         EMAIL_RE = re.compile(r"^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$")
-        error = False
         errorEmail= ""
         email = self.request.get('emailA')
         nemails = User.query(User.email==email).count()
 
         if not EMAIL_RE.match(email):
-            error = True
             errorEmail = "El email no es correcto!"
 
         if (nemails>=1):
-            error = True
             errorEmail= "Ese e-mail ya esta registrado"
 
         self.response.write(errorEmail)
 
-class MainHandler(webapp2.RequestHandler):
+class LoginHandler(session_module.BaseSessionHandler):
     def get(self):
-        self.response.out.write('''
-            <html>
-                <body>
-                    <head>
-                        <link rel="stylesheet" href="/styles/main_eu.css">
-                    </head>
-                    <p>Kaixo Mundua!</p>
-                    <img src="/images/kaixo.gif" />
-                </body>
-            </html>''')
+        values = {}
+        self.response.out.write(template.render('html/login.html', values))
+    
+    def post(self):
+        logedUser = ""
+        messageError = ""
+        error = False
+        password = self.request.get('password')
+        email = self.request.get('email')
 
-class EsHandler(webapp2.RequestHandler):
-    def get(self):
-        self.response.out.write('''
-            <html>
-                <body>
-                    <head>
-                        <link rel="stylesheet" href="/styles/main_es.css">
-                    </head>
-                    <p>Hola Mundo!</p>
-                    <img src="/images/kaixo.gif" />
-                </body>
-            </html>''')
+        PASSWORD_RE = re.compile(r"^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$")
+        EMAIL_RE = re.compile(r"^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$")
 
-class EnHandler(webapp2.RequestHandler):
-    def get(self):
-        self.response.out.write('''
-            <html>
-                <body>
-                    <head>
-                        <link rel="stylesheet" href="/styles/main_en.css">
-                    </head>
-                    <p>Hello World!</p>
-                    <img src="/images/kaixo.gif" />
-                </body>
-            </html>''')
+        #validate form info
+        if not PASSWORD_RE.match(password):
+                error = True
+        if not EMAIL_RE.match(email):
+                error = True
+
+        usuarios = ndb.gql("SELECT * FROM User WHERE email=:1 AND password=:2", email, password)
+        
+        if usuarios.count()==0:
+            error = True
+
+        if error:
+            messageError = "El email o la contrasena son incorrectos"
+            password = ""
+        else:
+            logedUser = email
+            self.session['logedUser'] = logedUser
+            email = ""
+            password = ""
+
+        values = {'messageError': messageError, 'email': email, 'password': password, 'logedUser': logedUser}
+        self.response.out.write(template.render('html/login.html', values))
 
 app = webapp2.WSGIApplication([
+    ('/logoutSession/', LogoutHandler),
     ('/', MainHandler),
-    ('/es', EsHandler),
-    ('/en', EnHandler),
     ('/registro', RegisterHandler),
+    ('/login', LoginHandler),
     ('/validate', ValidatorHandler),
-], debug=True)
-
-		
+],  debug=True)

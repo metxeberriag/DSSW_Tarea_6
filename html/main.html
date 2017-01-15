@@ -1,0 +1,32 @@
+
+<html lang="es">
+<head>
+    <title> EJERCICIO 6 </title>
+    <link rel="stylesheet" href="styles/estilo.css">
+</head>
+
+<body>
+    <tr>
+        <td>
+            <h1 class="register-title">EJERCICIO 6</h1>
+        </td>
+    </tr>
+    <form class="register">
+        <input type="button" value="Registro" class="register-button" onclick="window.location='/registro'"/>
+        <input type="button" value="Login" class="register-button" onclick="window.location='/login'"/>
+    </form>
+    <br>
+    <table class="register">
+        <tr>
+            <td colspan="6">
+                <div height="200">
+                    <p><a href="/logoutSession/?lang=es">Cerrar sesion:</a></p>
+                    <p>Sesion:{{sessionMessage}}</p>
+                    <p>Contador de accesos = {{counterMessage}}</p>
+                    <br>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

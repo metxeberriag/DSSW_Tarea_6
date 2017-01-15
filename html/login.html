@@ -1,0 +1,93 @@
+<html>
+<head>
+  <title>Inicio de Sesión</title>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <meta name="google-signin-client_id" content="606652852649-a4m0dlihj050t108ltlequa0cglsth09.apps.googleusercontent.com">
+  <script src="/js/signIn.js"></script>
+  <link rel="stylesheet" href="styles/estilo.css">
+  <script src="scripts/validator.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <table>
+
+    <tr>
+      <td colspan="6">
+        <h1 class="register-title">INICIO DE SESIÓN</h1>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="6">
+        <div class="body">
+          <table border="1">
+            <tr>
+            </td>
+            <td style="padding-left: 20px">
+              <br>
+              <form method="post" action="/login" class="register">
+                <center>Acceder con Google:</center><br>
+                <table class="myTables">
+                  <tbody>
+                    <tr>
+                      <br>
+                      {% ifequal logedUser None %}
+                      <div
+                      align="center"
+                      class="g-signin2"
+                      data-onsuccess="onSignIn"
+                      data-onfailure="onSignInFailure">
+                    </div>
+                    {% endifequal %}
+                    <br>
+                  </tr>
+                  <tr>
+                    {% ifnotequal logedUser None %}
+                    <div align="center">
+                      <p>Usuario ya logeado!</p>
+                    </div>
+                    {% endifnotequal %}
+                  </tr>  
+                </tbody>
+              </table>
+            </form>
+          </td>
+
+        </td>
+        <td style="padding-left: 20px">
+          <br>
+          <form method="post" action="/login" class="register">
+            <center>Acceder con la web:</center><br>
+            <table>
+              <tr>
+                <td class="label"> Email </td>
+                <td style="padding-left:1em"><input type="email" id="email"  name="email" value="{{email}}" class="register-input"/> </td>
+              </tr>
+              <tr>
+                <td class="label"> Contraseña </td>
+                <td style="padding-left:1em"><input type="password" name="password" id="password" value="{{password}}" autocomplete="off" class="register-input"/> </td>
+              </tr>
+              
+            </table>
+            <center><input type="submit" id="loginButton" value="Acceder" class="register-button"/></center>
+            <br>
+            <p style="color:red" id="messageError" align="center"> {{messageError}}</p>
+            {% ifnotequal logedUser None %}
+             <p id="logedUser">Usuario autenticado: {{logedUser}}</p>
+            {% endifnotequal %}
+          </form>
+        </td>
+      </tr> 
+    </table>
+  </div>
+</td>
+</tr>
+<tr>
+  <td class="return">
+    <input type="button" value="Inicio" class="register-button" onclick="window.location='/'"/>
+    <td>
+    </tr> 
+  </table>
+</body>
+</html>

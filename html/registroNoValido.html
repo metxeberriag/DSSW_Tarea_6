@@ -1,0 +1,37 @@
+
+<html>
+<head>
+    <link rel="stylesheet" href="styles/estilo.css">
+    <script src="scripts/validator.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1 class="register-title">DSSW - TAREA 6</h1>
+    <form method="post" id="login" class="register">
+        <table>
+            <tr>
+                <td class="label"> Nombre de usuario </td>
+                <td> <input type="text" name="username" id="username" value="{{username}}" placeholder="Tu nombre..." class="register-input"> </td>
+                <td> <span id="errorUsername" style="color:red">{{errorUsername}}</span> </td>
+            </tr>
+            <tr>
+                <td class="label"> Password </td>
+                <td> <input type="password" name="password1" id="password1" value="{{password1}}" placeholder="Tu contraseña..." class="register-input"></td>
+                <td> <span id="errorPassword1" style="color:red">{{errorPassword1}}</span> </td>
+            </tr>
+            <tr>
+                <td class="label">Repetir Password </td>
+                <td> <input type="password" name="password2" id="password2" value="{{password2}}" placeholder="El mismo de antes" class="register-input"> </td>
+                <td> <span id="errorPassword" style="color:red">{{errorPassword2}}</span> </td>
+            </tr>
+            <tr>
+                <td class="label"> Email </td>
+                <td> <input type="text" name="email" value="{{email}}" id="email" placeholder="Tu email..." class="register-input" onBlur="validarEmailAjax()"> </td>
+                <td> <span id="errorEmail" style="color:red">{{errorEmail}}</span> </td>
+            </tr>
+        </table>
+        <input type="submit" id="enviar" class="register-button">
+        <input type="button" value="Inicio" class="register-button" onclick="window.location='/'"/>
+    </form>
+</body>
+</html>

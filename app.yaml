@@ -5,12 +5,27 @@ api_version: 1
 threadsafe: yes
 
 handlers:
+- url: /images
+  static_dir: static/imagenes
+  
+- url: /scripts
+  static_dir: static/scripts
+
+- url: /styles
+  static_dir: static/estilos
+
+- url: /paginas
+  static_dir: static/html
+  
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
 
 - url: .*
   script: main.app
+
+- url: /registro
+  script: registro.app
 
 libraries:
 - name: webapp2
