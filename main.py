@@ -8,26 +8,21 @@ from google.appengine.ext.webapp \
 from webapp2_extras import sessions
 import session_module
 from google.appengine.ext import ndb
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
 
 
 class MainHandler(session_module.BaseSessionHandler):
     def get(self):
         sessionMessage = ""
         counterMessage = ""
-
+        self.session['logeado'] = False
         attr = {
             'sessionMessage': sessionMessage,
             'counterMessage': counterMessage
         }
 
         self.response.out.write(template.render('html/main.html', attr))
-
-
-class LogoutHandler(session_module.BaseSessionHandler):
-    def get(self):
-        if(self.session['counter']):
-            del self.session['counter']
-        self.redirect('/')
 
 class User(ndb.Model):
     username = ndb.StringProperty(required=True)
@@ -159,11 +154,10 @@ class LoginHandler(session_module.BaseSessionHandler):
         PASSWORD_RE = re.compile(r"^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$")
         EMAIL_RE = re.compile(r"^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$")
 
-        #validate form info
         if not PASSWORD_RE.match(password):
-                error = True
+            error = True
         if not EMAIL_RE.match(email):
-                error = True
+            error = True
 
         usuarios = ndb.gql("SELECT * FROM User WHERE email=:1 AND password=:2", email, password)
         
@@ -171,21 +165,36 @@ class LoginHandler(session_module.BaseSessionHandler):
             error = True
 
         if error:
-            messageError = "El email o la contrasena son incorrectos"
+            messageError = "El email o la contrasena son incorrectos!"
             password = ""
+            values = {'messageError': messageError, 'email': email, 'password': password}
+            self.response.out.write(template.render('html/login.html', values))
         else:
-            logedUser = email
-            self.session['logedUser'] = logedUser
-            email = ""
-            password = ""
+            self.session['user'] = email
+            self.redirect('/menu')
 
-        values = {'messageError': messageError, 'email': email, 'password': password, 'logedUser': logedUser}
-        self.response.out.write(template.render('html/login.html', values))
+class MenuHandler(session_module.BaseSessionHandler):
+    def get(self):
+        if 'user' in self.session:
+            usuarios = ndb.gql("SELECT * FROM User WHERE email=:1", self.session['user'])
+            username = usuarios.get().username
+            values = {'user' : username}
+            self.response.out.write(template.render('html/menu.html', values))
+        else:
+            values = {'messageError' : 'Tienes que logearte!'}
+            self.response.out.write(template.render('html/login.html', values))
+
+class LogoutHandler(session_module.BaseSessionHandler):
+    def get(self):
+        if(self.session['user']):
+            del self.session['user']
+        self.redirect('/')
 
 app = webapp2.WSGIApplication([
-    ('/logoutSession/', LogoutHandler),
+    ('/logoutSession', LogoutHandler),
+    ('/menu', MenuHandler),
     ('/', MainHandler),
     ('/registro', RegisterHandler),
     ('/login', LoginHandler),
     ('/validate', ValidatorHandler),
-],  debug=True)
+], config = session_module.config, debug=True)
