@@ -32,7 +32,7 @@
                   <tbody>
                     <tr>
                       <br>
-                    {% ifequal user None %}
+                      {% ifequal logedUser None %}
                       <div
                       align="center"
                       class="g-signin2"
@@ -43,7 +43,7 @@
                     <br>
                   </tr>
                   <tr>
-                    {% ifnotequal user None %}
+                    {% ifnotequal logedUser None %}
                     <div align="center">
                       <p>Usuario ya logeado!</p>
                     </div>
@@ -73,6 +73,9 @@
             <center><input type="submit" id="loginButton" value="Acceder" class="register-button"/></center>
             <br>
             <p style="color:red" id="messageError" align="center"> {{messageError}}</p>
+            {% ifnotequal logedUser None %}
+             <p id="logedUser">Usuario autenticado: {{logedUser}}</p>
+            {% endifnotequal %}
           </form>
         </td>
       </tr> 

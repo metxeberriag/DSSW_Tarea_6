@@ -27,15 +27,6 @@ handlers:
 - url: /registro
   script: registro.app
 
-- url: /login
-  script: login.app
-
-- url: /menu
-  script: menu.app
-
-- url: /updload
-  script: upload.app
-
 libraries:
 - name: webapp2
   version: "2.5.2"

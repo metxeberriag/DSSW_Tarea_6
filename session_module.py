@@ -21,9 +21,7 @@ class BaseSessionHandler(webapp2.RequestHandler):
             # Save all sessions.
             self.session_store.save_sessions(self.response)
 
-    @webapp2.cached_property
     def session(self):
         # Returns a session using the default cookie key.
         return self.session_store.get_session()
-
 #End of BaseSessionHandler Class
