@@ -181,8 +181,7 @@ class MenuHandler(session_module.BaseSessionHandler):
             values = {'user' : username}
             self.response.out.write(template.render('html/menu.html', values))
         else:
-            values = {'messageError' : 'Tienes que logearte!'}
-            self.response.out.write(template.render('html/login.html', values))
+            self.redirect('/')
 
 class LogoutHandler(session_module.BaseSessionHandler):
     def get(self):

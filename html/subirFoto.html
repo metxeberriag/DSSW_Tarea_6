@@ -1,11 +1,24 @@
-
 <html>
+<head>
+  <title>SUBIR UNA FOTO</title>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="/js/signIn.js"></script>
+  <link rel="stylesheet" href="../../styles/estilo.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
 <body>
-	<form action="{{url}}" method="POST" enctype="multipart/form- data">
-		<input type="file" name="file"><br>
-		<input type="radio" name="access" value="public" checked="checked" /> Public
-		<input type="radio" name="access" value="private" /> Private <p> 
-		<input type="submit" name="submit" value="Submit"> 
+    <tr>
+      <td colspan="6">
+        <h1 class="register-title">SUBIR FOTO</h1>
+      </td>
+    </tr>
+	<form action="{{url}}" method="POST" enctype="multipart/form-data" class="register">
+		<input type="file" name="file" required> <br><br>
+		<p>Tipo de fotografia:</p><br>
+		<input type="radio" name="access" value="public"> Publica </input> 
+		<input type="radio" name="access" value="private" checked="checked" > Privada </input> <br>
+		<input type="submit" name="submit" value="Subir" class="register-button"> 
+		<input type="button" value="Menu" class="register-button" onclick="window.location='/menu'"/>
 	</form>
 </body>
 </html>

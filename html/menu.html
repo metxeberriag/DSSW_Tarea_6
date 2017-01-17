@@ -13,18 +13,12 @@
     </tr>
     <form class="register">
         <p>Bienvenide a la aplicación {{user}}!</p>
-        <input type="button" value="Album" class="register-button" onclick="window.location='/album'"/>
-        <input type="button" value="Subir foto" class="register-button" onclick="window.location='/menu/upload'"/>
+        <input type="button" value="Album" class="register-button" onclick="window.location='/menu/album'"/>
+        <input type="button" value="Subir foto" id="foto" class="register-button" onclick="window.location='/menu/upload'"/>
+        <br>
+        <input type="button" value="Cerrar Sesión" class="register-button" onclick="window.location='/logoutSession'"/>
+        <p style="color:green" id="messageCorrect" align="center"> {{messageCorrect}}</p>
     </form>
     <br>
-    <table class="register">
-        <tr>
-            <td colspan="6">
-                <div height="200">
-                    <input type="button" value="Cerrar Sesión" class="register-button" onclick="window.location='/logoutSession'"/>
-                </div>
-            </td>
-        </tr>
-    </table>
 </body>
 </html>

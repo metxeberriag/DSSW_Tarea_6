@@ -21,20 +21,11 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
-- url: .*
-  script: main.app
-
-- url: /registro
-  script: registro.app
-
-- url: /login
-  script: login.app
-
-- url: /menu
+- url: /menu/.*
   script: menu.app
 
-- url: /updload
-  script: upload.app
+- url: .*
+  script: main.app
 
 libraries:
 - name: webapp2
