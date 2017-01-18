@@ -12,6 +12,22 @@ from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
 import base64
 
+def encode(key, clear):
+    enc = []
+    for i in range(len(clear)):
+        key_c = key[i % len(key)]
+        enc_c = (ord(clear[i]) + ord(key_c)) % 256
+        enc.append(enc_c)
+    return base64.urlsafe_b64encode(bytes(enc))
+
+def decode(key, enc):
+    dec = []
+    enc = base64.urlsafe_b64decode(enc)
+    for i in range(len(enc)):
+        key_c = key[i % len(key)]
+        dec_c = chr((256 + enc[i] - ord(key_c)) % 256)
+        dec.append(dec_c)
+    return "".join(dec)
 
 class MainHandler(session_module.BaseSessionHandler):
     def get(self):
@@ -114,7 +130,7 @@ class RegisterHandler(webapp2.RequestHandler):
                 datos = User()
                 datos.username = self.request.get('username')
                 datos.email = self.request.get('email')
-                datos.password = self.request.get('password1')
+                datos.password = encode('qAw993O2yVms5yZLBR3Qh660H60oKTWz',self.request.get('password1'))
                 datos.put()
                 attr = { 
                     'username' : username,
@@ -181,7 +197,8 @@ class LoginHandler(session_module.BaseSessionHandler):
                     self.session['login_tries'] = 0
 
                 if correcto:
-                    comprobarPassword = User.query().filter(User.email==email).filter(User.password==password).get()
+                    passwd = encode('qAw993O2yVms5yZLBR3Qh660H60oKTWz', password)
+                    comprobarPassword = User.query().filter(User.email==email).filter(User.password==passwd).get()
                     if comprobarPassword:
                         if comprobarPassword.bloqueado:
                             messageError = "Ese usuario esta bloqueado!"
