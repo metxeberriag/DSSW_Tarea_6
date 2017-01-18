@@ -10,6 +10,7 @@ import session_module
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
+import base64
 
 
 class MainHandler(session_module.BaseSessionHandler):
@@ -29,6 +30,7 @@ class User(ndb.Model):
     email = ndb.StringProperty(required=True)
     password = ndb.StringProperty(required=True)
     created= ndb.DateTimeProperty(auto_now_add=True)
+    bloqueado = ndb.BooleanProperty(default=False)
 
 class RegisterHandler(webapp2.RequestHandler):
     
@@ -145,33 +147,78 @@ class LoginHandler(session_module.BaseSessionHandler):
         self.response.out.write(template.render('html/login.html', values))
     
     def post(self):
-        logedUser = ""
-        messageError = ""
-        error = False
-        password = self.request.get('password')
-        email = self.request.get('email')
-
-        PASSWORD_RE = re.compile(r"^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$")
-        EMAIL_RE = re.compile(r"^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$")
-
-        if not PASSWORD_RE.match(password):
-            error = True
-        if not EMAIL_RE.match(email):
-            error = True
-
-        usuarios = ndb.gql("SELECT * FROM User WHERE email=:1 AND password=:2", email, password)
-        
-        if usuarios.count()==0:
-            error = True
-
-        if error:
-            messageError = "El email o la contrasena son incorrectos!"
-            password = ""
-            values = {'messageError': messageError, 'email': email, 'password': password}
-            self.response.out.write(template.render('html/login.html', values))
-        else:
-            self.session['user'] = email
+        if 'user' in self.session:
             self.redirect('/menu')
+        else:
+            password = self.request.get('password')
+            email = self.request.get('email')
+
+            messageError = ""
+            error = False
+            existe = True
+            correcto = True
+
+            PASSWORD_RE = re.compile(r"^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$")
+            EMAIL_RE = re.compile(r"^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$")
+
+            if not PASSWORD_RE.match(password):
+                error = True
+
+            if not EMAIL_RE.match(email):
+                error = True
+
+            usuarios = User.query().filter(User.email==email)
+
+            if usuarios.count()==0:
+                existe = False
+
+            if existe and not error:
+                if not 'login_tries' in self.session:
+                    self.session['login_tries'] = 0
+                    correcto = True
+                elif not (self.session['login_tries'] < 3):
+                    correcto = False
+                    self.session['login_tries'] = 0
+
+                if correcto:
+                    comprobarPassword = User.query().filter(User.email==email).filter(User.password==password).get()
+                    if comprobarPassword:
+                        if comprobarPassword.bloqueado:
+                            messageError = "Ese usuario esta bloqueado!"
+                            password = ""
+                            values = {'messageError': messageError, 'email': email, 'password': password}
+                            self.response.out.write(template.render('html/login.html', values))
+                        else:
+                            self.session['user'] = email
+                            self.session['login_tries'] = 0
+                            self.redirect('/menu')
+
+                    elif usuarios.get().bloqueado:
+                        messageError = "Ese usuario esta bloqueado!"
+                        password = ""
+                        self.session['login_tries'] = 0
+                        values = {'messageError': messageError, 'email': email, 'password': password}
+                        self.response.out.write(template.render('html/login.html', values))
+                    else:
+                        intentos = 2-self.session['login_tries']
+                        messageError = "El email o la contrasena son incorrectos! Tienes "+str(intentos)+" intentos más."
+                        self.session['login_tries'] = self.session['login_tries']+1
+                        password = ""
+                        values = {'messageError': messageError, 'email': email, 'password': password}
+                        self.response.out.write(template.render('html/login.html', values))
+                else:
+                    messageError = "Se ha bloqueado la cuenta!"
+                    usuario2 = User.query().filter(User.email==email).get()
+                    usuario2.bloqueado = True
+                    usuario2.put()
+                    values = {'messageError': messageError}
+                    self.response.out.write(template.render('html/login.html', values))    
+            else:
+                messageError = "El email o la contrasena son incorrectos!" 
+                values = {'messageError': messageError, 'email': email, 'password': password}
+                self.response.out.write(template.render('html/login.html', values))
+
+                
 
 class MenuHandler(session_module.BaseSessionHandler):
     def get(self):

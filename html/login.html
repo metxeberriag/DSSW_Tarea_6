@@ -2,7 +2,7 @@
 <head>
   <title>Inicio de Sesión</title>
   <script src="https://apis.google.com/js/platform.js" async defer></script>
-  <meta name="google-signin-client_id" content="606652852649-a4m0dlihj050t108ltlequa0cglsth09.apps.googleusercontent.com">
+  <meta name="google-signin-client_id" content="1075415468106-gfpaqoo0vc23u0bahda9qu8cf2n1ai5p.apps.googleusercontent.com">
   <script src="/js/signIn.js"></script>
   <link rel="stylesheet" href="styles/estilo.css">
   <script src="scripts/validator.js"></script>
@@ -28,7 +28,7 @@
               <br>
               <form method="post" action="/login" class="register">
                 <center>Acceder con Google:</center><br>
-                <table class="myTables">
+                <table>
                   <tbody>
                     <tr>
                       <br>
@@ -71,8 +71,8 @@
               
             </table>
             <center><input type="submit" id="loginButton" value="Acceder" class="register-button"/></center>
-            <br>
             <p style="color:red" id="messageError" align="center"> {{messageError}}</p>
+            <input type="hidden" name="intentos" value="0"/>
           </form>
         </td>
       </tr> 

@@ -54,8 +54,6 @@ class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
 
 class AlbumHandler(session_module.BaseSessionHandler, blobstore_handlers.BlobstoreUploadHandler):
     def get(self):
-        images = blobstore.BlobInfo.all()
-        public_images = Image.query().filter(Image.public == True)
 
         if 'user' in self.session:
             private_images = Image.query().filter(Image.public == False).filter(Image.user == self.session.get('email'))
@@ -65,6 +63,8 @@ class AlbumHandler(session_module.BaseSessionHandler, blobstore_handlers.Blobsto
             for img in private_images:
                 private += '<img onmouseover="preview.src=img{0}.src" name="img{0}" src="/menu/serve/{1}" alt="" />'.format(priv,img.blobkey)
                 priv += 1
+
+            public_images = Image.query().filter(Image.public == True).filter(Image.user == self.session.get('email'))
 
             public = ""
             pub = 1
@@ -81,6 +81,7 @@ class AlbumHandler(session_module.BaseSessionHandler, blobstore_handlers.Blobsto
             )
 
         else:
+            public_images = Image.query().filter(Image.public == True).filter(Image.user == self.session.get('email'))
             public = ""
             pub = 1
             for img in public_images:
