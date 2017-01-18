@@ -195,6 +195,7 @@ input {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
+
 :-moz-placeholder {
   color: #aaa;
   font-weight: 300;

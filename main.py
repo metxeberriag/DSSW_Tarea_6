@@ -11,6 +11,9 @@ from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
 import base64
+import urllib
+import json
+
 
 def encode(key, clear):
     enc = []
@@ -235,8 +238,6 @@ class LoginHandler(session_module.BaseSessionHandler):
                 values = {'messageError': messageError, 'email': email, 'password': password}
                 self.response.out.write(template.render('html/login.html', values))
 
-                
-
 class MenuHandler(session_module.BaseSessionHandler):
     def get(self):
         if 'user' in self.session:
@@ -253,9 +254,32 @@ class LogoutHandler(session_module.BaseSessionHandler):
             del self.session['user']
         self.redirect('/')
 
+class MapHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.out.write(template.render('html/mapa.html', {}))
+
+    def post(self):
+        #ask for data
+        serviceurl = 'http://maps.googleapis.com/maps/api/geocode/json?'
+        address = self.request.get('address')
+        url = serviceurl + urllib.urlencode({'address': address})
+        uh = urllib.urlopen(url)
+        data = uh.read()
+        #process the result
+        js = json.loads(str(data))
+        try:
+            location = js['results'][0]['formatted_address']
+            lat = js['results'][0]['geometry']['location']['lat']
+            lng = js['results'][0]['geometry']['location']['lng']
+            values = {'address': address , 'locationOK': location , 'lat': lat, 'lng': lng}
+        except:
+            values = {'locationWrong': "Ese sitio no existe!"}
+        self.response.out.write(template.render('html/mapa.html', values))
+
 app = webapp2.WSGIApplication([
     ('/logoutSession', LogoutHandler),
     ('/menu', MenuHandler),
+    ('/mapa', MapHandler),
     ('/', MainHandler),
     ('/registro', RegisterHandler),
     ('/login', LoginHandler),

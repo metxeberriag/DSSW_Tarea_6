@@ -61,7 +61,7 @@ class AlbumHandler(session_module.BaseSessionHandler, blobstore_handlers.Blobsto
             private = ""
             priv = 1
             for img in private_images:
-                private += '<img onmouseover="preview.src=img{0}.src" name="img{0}" src="/menu/serve/{1}" alt="" />'.format(priv,img.blobkey)
+                private += '<div class="responsive"><div class="img"><img onmouseover="preview.src=img{0}.src" name="img{0}" src="/menu/serve/{1}" alt="" /></div></div>'.format(priv,img.blobkey)
                 priv += 1
 
             public_images = Image.query().filter(Image.public == True).filter(Image.user == self.session.get('email'))
@@ -69,7 +69,7 @@ class AlbumHandler(session_module.BaseSessionHandler, blobstore_handlers.Blobsto
             public = ""
             pub = 1
             for img in public_images:
-                public += '<img onmouseover="preview.src=img{0}.src" name="img{0}" src="/menu/serve/{1}" alt="" />'.format(pub,img.blobkey)
+                public += '<div class="responsive"><div class="img"><img onmouseover="preview.src=img{0}.src" name="img{0}" src="/menu/serve/{1}" alt="" /></div></div>'.format(pub,img.blobkey)
                 pub += 1
 
             values = {}
@@ -85,7 +85,7 @@ class AlbumHandler(session_module.BaseSessionHandler, blobstore_handlers.Blobsto
             public = ""
             pub = 1
             for img in public_images:
-                public += '<img onmouseover="preview.src=img{0}.src" name="img{0}" src="/menu/serve/{1}" alt="" />'.format(pub,img.blobkey)
+                public += '<div class="responsive"><div class="img"><img onmouseover="preview.src=img{0}.src" name="img{0}" src="/menu/serve/{1}" alt="" /></div></div>'.format(pub,img.blobkey)
                 pub += 1
 
             values = {}

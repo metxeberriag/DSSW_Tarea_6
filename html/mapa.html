@@ -1,0 +1,35 @@
+<head>
+  <title>EJERCICIO 6</title>
+  <link rel="stylesheet" href="styles/estilo.css">
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta charset="utf-8">
+  <script src="/js/map.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsxA8vJkdC7u7wr07XsSYGWhnF3RLXdhk&callback=initMap" async defer></script>
+</head>
+
+<body>
+    <tr>
+        <td>
+            <h1 class="register-title" align="center">MAPAS</h1>
+        </td>
+    </tr>
+      <form method="post" action="" class="register" autocomplete="False">
+        <p class="label"> Introduce la dirección: </p>
+        <input type="text" id="address" name="address" value="{{address}}" placeholder="Address" class="register-input"/>
+        <button type="submit" class="register-button">Enviar</button>
+        <br>
+        <p><b> {{locationOK}} </b></p>
+        <p style="color:red"> {{locationWrong}} </p>
+        <td align="left">
+          <p id="lat" class="label">Latitud: {{lat}}</p>
+        <td>
+          <p id="lng" class="label">Longitud: {{lng}}</p>
+        </td>
+        <td>
+          <input type="button" value="Inicio" class="register-button" onclick="window.location='/'"/>
+        <td>
+      </form>
+  <div id="map"></div>
+  <br>
+</body>
+</html>
